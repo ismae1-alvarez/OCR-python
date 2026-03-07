@@ -3,7 +3,7 @@ server.py – Backend Flask ERP
 Soporta: VIFER (CFDI) y ALESSIA (Pedido SAP)
 pip install flask flask-cors pdfplumber openpyxl
 """
-import io, re
+import io, re, os
 from flask import Flask, request, send_file, jsonify
 from flask_cors import CORS
 import pdfplumber
