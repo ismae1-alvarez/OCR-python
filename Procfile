@@ -1,1 +1,1 @@
-web: gunicorn main:app --bind 0.0.0.0:$PORT --workers 1 --worker-class gevent --timeout 300 --keep-alive 5
+web: /mise/installs/python/3.13.12/bin/gunicorn main:app --bind 0.0.0.0:$PORT
