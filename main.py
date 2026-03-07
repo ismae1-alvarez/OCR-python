@@ -1,12 +1,12 @@
 """
 server.py – Backend Flask ERP
 Soporta: VIFER (CFDI) y ALESSIA (Pedido SAP)
-pip install flask flask-cors pdfplumber openpyxl
+pip install flask flask-cors pymupdf openpyxl
 """
 import io, re
 from flask import Flask, request, send_file, jsonify
 from flask_cors import CORS
-import pdfplumber
+import fitz  # pymupdf
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
@@ -41,10 +41,11 @@ def editable(cell,bg=YELLOW,fmt=None):
 
 # ── Parser VIFER CFDI ─────────────────────────────────────────────────────────
 def parse_cfdi(pdf_bytes):
-    with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
-        lines=[]; ft=""
-        for page in pdf.pages:
-            t=page.extract_text() or ""; ft+=t+"\n"; lines.extend(t.split("\n"))
+    doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+    ft = ""; lines = []
+    for page in doc:
+        t = page.get_text() or ""; ft += t + "\n"; lines.extend(t.split("\n"))
+    doc.close()
 
     def find(pat,default=""):
         m=re.search(pat,ft,re.MULTILINE)
@@ -114,10 +115,11 @@ def parse_cfdi(pdf_bytes):
 
 # ── Parser ALESSIA SAP ────────────────────────────────────────────────────────
 def parse_alessia(pdf_bytes):
-    with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
-        lines=[]; ft=""
-        for page in pdf.pages:
-            t=page.extract_text() or ""; ft+=t+"\n"; lines.extend(t.split("\n"))
+    doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+    ft = ""; lines = []
+    for page in doc:
+        t = page.get_text() or ""; ft += t + "\n"; lines.extend(t.split("\n"))
+    doc.close()
 
     def find(pat,default=""):
         m=re.search(pat,ft,re.MULTILINE)
