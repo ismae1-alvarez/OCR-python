@@ -1,1 +1,1 @@
-web: /mise/installs/python/3.13.12/bin/gunicorn main:app --bind 0.0.0.0:$PORT
+web: gunicorn main:app
