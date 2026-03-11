@@ -1,6 +1,0 @@
-flask
-flask-cors
-pdfplumber
-openpyxl
-gunicorn
-pdfminer.six
