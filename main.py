@@ -92,19 +92,27 @@ def parse_cfdi(pdf_bytes):
         "cliente_domicilio":find(r"(CALLE[^\n]+)")}
 
     item_re=re.compile(r"^(\d+\.\d{2})\s+(H87|PR)\s+(\d{5,})\s+(.+?)\s+([\d,]+\.\d{2})\s+MXN\s+([\d,]+\.\d{2})\s+MXN\s+([\d,]+\.\d{2})\s+MXN")
-    um_id_re=re.compile(r"^(PZA|PR)\s+(\d{4})")
+    # um_id_re=re.compile(r"^(PZA|PR)\s+(\d{4})")
+    um_id_re=re.compile(r"^(PZA|PR|KG|LT|MT)\s+(\d{4,})$")
     items=[]; pu=pi=""
     for line in lines:
         m=um_id_re.match(line.strip())
         if m: pu=m.group(1); pi=m.group(2); continue
         m=item_re.match(line.strip())
         if m:
-            imp=float(m.group(6).replace(",",""))
+            desc=float(m.group(5).replace(",",""))   # grupo 5 = descuento
+            precio=float(m.group(6).replace(",","")) # grupo 6 = precio unitario
+            imp=float(m.group(7).replace(",",""))    # grupo 7 = importe
             items.append({"no_identif":pi,"descripcion":m.group(4).strip(),
                 "cantidad":float(m.group(1)),"um":pu or m.group(2),"clave_sat":m.group(3),
-                "precio_unit":float(m.group(5).replace(",","")),"importe":imp,
-                "descuento":float(m.group(7).replace(",","")),"iva":round(imp*0.16,2)})
-            pu=pi=""
+                "precio_unit":precio,"importe":imp,
+                "descuento":desc,"iva":round(imp*0.16,2)})
+            # imp=float(m.group(6).replace(",",""))
+            # items.append({"no_identif":pi,"descripcion":m.group(4).strip(),
+            #     "cantidad":float(m.group(1)),"um":pu or m.group(2),"clave_sat":m.group(3),
+            #     "precio_unit":float(m.group(5).replace(",","")),"importe":imp,
+            #     "descuento":float(m.group(7).replace(",","")),"iva":round(imp*0.16,2)})
+            # pu=pi=""
     sub=float((find(r"Subtotal\s+([\d,]+\.\d{2})\s+MXN") or "0").replace(",",""))
     tot=float((find(r"Total\s+([\d,]+\.\d{2})\s+MXN") or "0").replace(",",""))
     letra=find(r"\(([A-Z\u00C1\u00C9\u00CD\u00D3\u00DA\u00D1\s]+\d+/100\s+MN)\)")
